@@ -34,9 +34,9 @@ export async function generateYouTubeScript(topic: string): Promise<ScriptData> 
     throw new Error('Missing GEMINI_API_KEY in environment variables.');
   }
 
-  let modelName = (process.env.GEMINI_MODEL || 'gemini-3.8-flash').replace(/^["']|["']$/g, '').trim();
-  if (modelName === 'gemini-1.5-pro' || modelName === 'gemini-2.5-flash') {
-    modelName = 'gemini-3.8-flash';
+  let modelName = (process.env.GEMINI_MODEL || 'gemini-2.5-flash').replace(/^["']|["']$/g, '').trim();
+  if (!modelName || modelName === 'gemini-1.5-pro') {
+    modelName = 'gemini-2.5-flash';
   }
   const ai = new GoogleGenAI({ apiKey });
 
@@ -77,10 +77,10 @@ REGLAS DE PRODUCCIÓN:
   const candidateModels = [
     modelName,
     'gemini-2.5-flash',
-    'gemini-1.5-flash',
     'gemini-2.0-flash',
+    'gemini-1.5-flash',
     'gemini-2.5-pro',
-  ].filter((v, i, a) => Boolean(v) && a.indexOf(v) === i);
+  ].filter((v, i, a) => Boolean(v) && v !== 'gemini-1.5-pro' && a.indexOf(v) === i);
 
   let lastError: any = null;
 
