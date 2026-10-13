@@ -1,5 +1,5 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getSupabase } from './lib/supabase';
+import { getSupabase } from '../lib/supabase';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   const startTime = Date.now();

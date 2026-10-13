@@ -1,6 +1,6 @@
 import type { VercelRequest, VercelResponse } from '@vercel/node';
-import { getSupabase, PipelineItem } from './lib/supabase';
-import { generateYouTubeScript, isRateLimitError } from './lib/gemini';
+import { getSupabase, PipelineItem } from '../lib/supabase';
+import { generateYouTubeScript, isRateLimitError } from '../lib/gemini';
 
 export default async function handler(req: VercelRequest, res: VercelResponse) {
   // Allow GET and POST methods

@@ -11,6 +11,6 @@
     "forceConsistentCasingInFileNames": true,
     "outDir": "./dist"
   },
-  "include": ["api/**/*"],
+  "include": ["api/**/*", "lib/**/*"],
   "exclude": ["node_modules", "local_worker"]
 }
