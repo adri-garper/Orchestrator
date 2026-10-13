@@ -76,11 +76,9 @@ REGLAS DE PRODUCCIÓN:
 
   const candidateModels = [
     modelName,
+    'gemini-3.8-flash',
     'gemini-3.1-pro-preview',
-    'gemini-2.5-flash',
-    'gemini-2.0-flash',
-    'gemini-1.5-flash',
-  ].filter((v, i, a) => Boolean(v) && v !== 'gemini-1.5-pro' && v !== 'gemini-2.5-pro' && a.indexOf(v) === i);
+  ].filter((v, i, a) => Boolean(v) && !v.includes('1.5') && !v.includes('2.5') && a.indexOf(v) === i);
 
   let lastError: any = null;
 
@@ -132,5 +130,5 @@ REGLAS DE PRODUCCIÓN:
     }
   }
 
-  throw lastError || new Error('All candidate Gemini models failed.');
+  throw new Error(`[Gemini Error] ${lastError?.message || lastError || 'All candidate Gemini models failed.'}`);
 }
