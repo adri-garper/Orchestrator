@@ -1,0 +1,30 @@
+name: Orchestrator 15-Min Scheduler
+
+on:
+  schedule:
+    # Runs every 15 minutes (Backup scheduler if Vercel Hobby limits cron to daily)
+    - cron: '*/15 * * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions tab
+
+jobs:
+  trigger-orchestrator:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Orchestrator API
+        env:
+          VERCEL_APP_URL: ${{ secrets.VERCEL_APP_URL }}
+          CRON_SECRET: ${{ secrets.CRON_SECRET }}
+        run: |
+          if [ -z "$VERCEL_APP_URL" ]; then
+            echo "VERCEL_APP_URL secret is not configured. Skipping external cron trigger."
+            exit 0
+          fi
+          
+          # Clean URL trailing slash
+          CLEAN_URL="${VERCEL_APP_URL%/}"
+          
+          echo "Pinging $CLEAN_URL/api/orchestrator..."
+          curl -s -X POST "$CLEAN_URL/api/orchestrator" \
+            -H "Content-Type: application/json" \
+            -H "Authorization: Bearer $CRON_SECRET" \
+            -w "\nHTTP Status: %{http_code}\n"

@@ -1,0 +1,24 @@
+{
+  "name": "orchestrator",
+  "version": "1.0.0",
+  "description": "Serverless AI YouTube Pipeline Orchestrator on Vercel + Supabase",
+  "main": "api/orchestrator.ts",
+  "scripts": {
+    "build": "tsc",
+    "type-check": "tsc --noEmit",
+    "test": "echo \"No test specified\" && exit 0"
+  },
+  "keywords": ["orchestrator", "vercel", "supabase", "gemini", "ai-video"],
+  "author": "Adrian Garcia",
+  "license": "MIT",
+  "dependencies": {
+    "@google/genai": "^2.29.1",
+    "@supabase/supabase-js": "^2.49.0",
+    "dotenv": "^16.4.7"
+  },
+  "devDependencies": {
+    "@types/node": "^22.10.0",
+    "@vercel/node": "^5.1.0",
+    "typescript": "^5.7.0"
+  }
+}
