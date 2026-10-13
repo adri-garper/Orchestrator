@@ -2,10 +2,9 @@
   "name": "orchestrator",
   "version": "1.0.0",
   "description": "Serverless AI YouTube Pipeline Orchestrator on Vercel + Supabase",
-  "main": "api/orchestrator.ts",
   "scripts": {
-    "build": "echo 'Build complete'",
     "type-check": "tsc --noEmit",
+    "test:db": "tsx scripts/test-supabase.ts",
     "test": "echo \"No test specified\" && exit 0"
   },
   "keywords": [
