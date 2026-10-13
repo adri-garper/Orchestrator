@@ -34,9 +34,9 @@ export async function generateYouTubeScript(topic: string): Promise<ScriptData> 
     throw new Error('Missing GEMINI_API_KEY in environment variables.');
   }
 
-  let modelName = (process.env.GEMINI_MODEL || 'gemini-2.5-flash').replace(/^["']|["']$/g, '').trim();
-  if (modelName === 'gemini-1.5-pro') {
-    modelName = 'gemini-2.5-flash';
+  let modelName = (process.env.GEMINI_MODEL || 'gemini-3.8-flash').replace(/^["']|["']$/g, '').trim();
+  if (modelName === 'gemini-1.5-pro' || modelName === 'gemini-2.5-flash') {
+    modelName = 'gemini-3.8-flash';
   }
   const ai = new GoogleGenAI({ apiKey });
 
@@ -74,33 +74,58 @@ REGLAS DE PRODUCCIÓN:
 }
 `;
 
-  try {
-    const response = await ai.models.generateContent({
-      model: modelName,
-      contents: prompt,
-      config: {
-        responseMimeType: 'application/json',
-      },
-    });
+  const candidateModels = [
+    modelName,
+    'gemini-2.5-flash',
+    'gemini-1.5-flash',
+    'gemini-2.0-flash',
+    'gemini-2.5-pro',
+  ].filter((v, i, a) => Boolean(v) && a.indexOf(v) === i);
 
-    const rawText = response.text;
-    if (!rawText) {
-      throw new Error('Gemini returned an empty response.');
+  let lastError: any = null;
+
+  for (const currentModel of candidateModels) {
+    try {
+      console.log(`[Gemini] Generating script with model: "${currentModel}"...`);
+      const response = await ai.models.generateContent({
+        model: currentModel,
+        contents: prompt,
+        config: {
+          responseMimeType: 'application/json',
+        },
+      });
+
+      const rawText = response.text;
+      if (!rawText) {
+        throw new Error(`Gemini (${currentModel}) returned an empty response.`);
+      }
+
+      // Clean potential markdown blocks if present
+      const cleanedJson = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
+      const script: ScriptData = JSON.parse(cleanedJson);
+
+      if (!script.title || !Array.isArray(script.scenes) || script.scenes.length === 0) {
+        throw new Error('Invalid script structure returned from Gemini model.');
+      }
+
+      console.log(`[Gemini] Script successfully generated with model: "${currentModel}"`);
+      return script;
+    } catch (err: any) {
+      lastError = err;
+      if (isRateLimitError(err)) {
+        throw new QuotaExceededError(err.message || 'Gemini API 429 Quota Exceeded');
+      }
+
+      const errMsg = String(err.message || err).toLowerCase();
+      // If 404 / model not supported on this endpoint, try the next model
+      if (errMsg.includes('404') || errMsg.includes('not found') || errMsg.includes('not supported')) {
+        console.warn(`[Gemini] Model "${currentModel}" not available on this API key (404). Trying next fallback...`);
+        continue;
+      }
+
+      throw err;
     }
-
-    // Clean potential markdown blocks if present
-    const cleanedJson = rawText.replace(/^```json\s*/i, '').replace(/```\s*$/i, '').trim();
-    const script: ScriptData = JSON.parse(cleanedJson);
-
-    if (!script.title || !Array.isArray(script.scenes) || script.scenes.length === 0) {
-      throw new Error('Invalid script structure returned from Gemini model.');
-    }
-
-    return script;
-  } catch (err: any) {
-    if (isRateLimitError(err)) {
-      throw new QuotaExceededError(err.message || 'Gemini API 429 Quota Exceeded');
-    }
-    throw err;
   }
+
+  throw lastError || new Error('All candidate Gemini models failed.');
 }
