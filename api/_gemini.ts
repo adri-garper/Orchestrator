@@ -29,7 +29,7 @@ export function isRateLimitError(error: any): boolean {
 }
 
 export async function generateYouTubeScript(topic: string): Promise<ScriptData> {
-  const apiKey = process.env.GEMINI_API_KEY;
+  const apiKey = (process.env.GEMINI_API_KEY || '').replace(/^["']|["']$/g, '').trim();
   if (!apiKey) {
     throw new Error('Missing GEMINI_API_KEY in environment variables.');
   }
