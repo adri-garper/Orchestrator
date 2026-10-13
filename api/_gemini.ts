@@ -76,11 +76,11 @@ REGLAS DE PRODUCCIÓN:
 
   const candidateModels = [
     modelName,
+    'gemini-3.1-pro-preview',
     'gemini-2.5-flash',
     'gemini-2.0-flash',
     'gemini-1.5-flash',
-    'gemini-2.5-pro',
-  ].filter((v, i, a) => Boolean(v) && v !== 'gemini-1.5-pro' && a.indexOf(v) === i);
+  ].filter((v, i, a) => Boolean(v) && v !== 'gemini-1.5-pro' && v !== 'gemini-2.5-pro' && a.indexOf(v) === i);
 
   let lastError: any = null;
 
@@ -117,9 +117,14 @@ REGLAS DE PRODUCCIÓN:
       }
 
       const errMsg = String(err.message || err).toLowerCase();
-      // If 404 / model not supported on this endpoint, try the next model
-      if (errMsg.includes('404') || errMsg.includes('not found') || errMsg.includes('not supported')) {
-        console.warn(`[Gemini] Model "${currentModel}" not available on this API key (404). Trying next fallback...`);
+      // If 404 / model not supported / no longer available on this endpoint, try the next model
+      if (
+        errMsg.includes('404') ||
+        errMsg.includes('not found') ||
+        errMsg.includes('not supported') ||
+        errMsg.includes('no longer available')
+      ) {
+        console.warn(`[Gemini] Model "${currentModel}" not available on this API key. Trying next fallback...`);
         continue;
       }
 
