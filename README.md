@@ -125,7 +125,7 @@ En tu ordenador (cuando quieras procesar los vídeos generados):
 1. Abre una consola en la subcarpeta `local_worker`:
    ```bash
    cd local_worker
-   pip install -r requirements.txt
+   pip install -r requirements-pc.txt
    ```
 2. Asegúrate de tener instalado **FFmpeg** en tu sistema y accesible en el PATH.
 3. Copia el archivo `.env.example` a `.env` en la raíz con tus credenciales de Supabase.

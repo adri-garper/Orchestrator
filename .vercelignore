@@ -1,0 +1,7 @@
+# Ignore local PC worker files so Vercel doesn't confuse it with Python serverless functions
+local_worker/
+*.py
+requirements*.txt
+supabase_schema.sql
+output/
+temp/

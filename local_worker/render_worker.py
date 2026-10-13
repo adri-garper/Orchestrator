@@ -22,7 +22,7 @@ from dotenv import load_dotenv
 try:
     from supabase import create_client, Client
 except ImportError:
-    print("Error: Missing supabase library. Run: pip install -r requirements.txt")
+    print("Error: Missing supabase library. Run: pip install -r requirements-pc.txt")
     sys.exit(1)
 
 # Load environment from root .env or local .env
