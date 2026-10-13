@@ -54,6 +54,12 @@ Diseñado para funcionar sin necesidad de servidores encendidos 24/7: se despier
    - Cuando enciendas el ordenador, ejecutas el script `render_worker.py`.
    - Consulta a Supabase si hay vídeos con estado `ready_for_pc`. Si los hay, genera la voz en off con Edge-TTS y renderiza el vídeo final a 1080p usando tu tarjeta gráfica (NVIDIA NVENC).
 
+4. **Sistema Anti-Pausa 24/7 (Keep-Alive para Supabase y Vercel)**:
+   - Supabase pausa automáticamente los proyectos de su capa gratuita tras 7 días sin actividad.
+   - El endpoint `/api/keep-alive` realiza una lectura ligera en Supabase y devuelve el estado de salud en milisegundos, reseteando el contador de 7 días.
+   - Incluye un workflow de GitHub Actions que hace ping automáticamente 4 veces al día (cada 6 horas).
+
+
 ---
 
 ## 🚀 Guía de Puesta en Marcha Paso a Paso

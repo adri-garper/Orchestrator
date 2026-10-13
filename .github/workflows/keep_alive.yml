@@ -1,0 +1,42 @@
+name: Keep-Alive (Prevent Supabase & Vercel Auto-Pause)
+
+on:
+  schedule:
+    # Runs 4 times a day (every 6 hours) to guarantee Supabase never hits the 7-day inactivity pause
+    - cron: '0 */6 * * *'
+  workflow_dispatch: # Allows manual trigger from GitHub Actions
+
+jobs:
+  ping-services:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Ping Keep-Alive Endpoint
+        env:
+          VERCEL_APP_URL: ${{ vars.VERCEL_APP_URL || secrets.VERCEL_APP_URL }}
+        run: |
+          if [ -z "$VERCEL_APP_URL" ]; then
+            echo "⚠️ [AVISO] Ni vars.VERCEL_APP_URL ni secrets.VERCEL_APP_URL están configurados."
+            echo "Para activar el ping automático:"
+            echo "1. Ve a tu repo en GitHub -> Settings -> Secrets and variables -> Actions."
+            echo "2. Crea una Variable (o Secret) llamada VERCEL_APP_URL con la URL de tu app (ej: https://orchestrator-xxx.vercel.app)."
+            exit 0
+          fi
+
+          # Clean URL
+          CLEAN_URL="${VERCEL_APP_URL%/}"
+          TARGET_URL="$CLEAN_URL/api/keep-alive"
+
+          echo "🚀 Enviando Keep-Alive ping a: $TARGET_URL"
+          RESPONSE=$(curl -s -w "\n%{http_code}" "$TARGET_URL")
+          HTTP_CODE=$(echo "$RESPONSE" | tail -n 1)
+          BODY=$(echo "$RESPONSE" | head -n -1)
+
+          echo "HTTP Status: $HTTP_CODE"
+          echo "Respuesta: $BODY"
+
+          if [ "$HTTP_CODE" -ge 200 ] && [ "$HTTP_CODE" -lt 300 ]; then
+            echo "✅ Keep-Alive completado con éxito. Supabase y Vercel permanecen activos."
+          else
+            echo "❌ Fallo en Keep-Alive. Código HTTP: $HTTP_CODE"
+            exit 1
+          fi
